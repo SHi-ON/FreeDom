@@ -44,7 +44,7 @@ def tri_part_dom():
             doms.append(pre + suff + TLD)
 
     # 3. Get list of domains that have already found to be free and removed them
-    checked_domains = [line.strip() for line in open('free-domains.txt')]  # Strip out newlines too
+    checked_domains = [line.strip() for line in open('checked.txt')]  # Strip out newlines too
     for remove in checked_domains:
         try:
             doms.remove(remove)
@@ -55,6 +55,7 @@ def tri_part_dom():
 
 
 def three_letter_dom():
+    # three-letter domains examination
     doms = list()
     for l1 in string.ascii_lowercase:
         for l2 in string.ascii_lowercase:
@@ -81,7 +82,7 @@ def report_failures(d):
         h_failed.write(d + '\n')
 
 
-# domains = tri_part_dom()
+# d = tri_part_dom()
 d = three_letter_dom()
 
 domains = eliminate_checked(d)
