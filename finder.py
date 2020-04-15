@@ -67,6 +67,20 @@ def three_letter_dom():
     return doms
 
 
+def four_letter_dom():
+    # three-letter domains examination
+    doms = list()
+    for l1 in string.ascii_lowercase:
+        for l2 in string.ascii_lowercase:
+            for l3 in string.ascii_lowercase:
+                for l4 in string.ascii_lowercase:
+                    doms.append(l1 + l2 + l3 + l4 + TLD)
+
+    print('size:', len(doms))
+
+    return doms
+
+
 def eliminate_checked(doms):
     with open('checked.txt') as handle:
         content = list(map(str.rstrip, handle.readlines()))
@@ -83,6 +97,7 @@ def report_failures(d):
 
 
 # d = tri_part_dom()
+# d = four_letter_dom()
 d = three_letter_dom()
 
 domains = eliminate_checked(d)
