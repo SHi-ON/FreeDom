@@ -14,6 +14,9 @@ except ImportError:
 # Change top-level domain to check here
 TLD = '.com'
 
+VOWELS = 'aeiou'
+CONSONANTS = ''.join(filter(lambda x: x not in 'aeiou', string.ascii_lowercase))
+
 
 def tri_part_dom():
     # 1. Get prefixes and suffixes from input.txt
@@ -81,6 +84,21 @@ def four_letter_dom():
     return doms
 
 
+def cvcvc_dom():
+    # 5-letter CVCVC domain names
+    doms = list()
+    for l1 in CONSONANTS:
+        for l2 in VOWELS:
+            for l3 in CONSONANTS:
+                for l4 in VOWELS:
+                    for l5 in CONSONANTS:
+                        doms.append(l1 + l2 + l3 + l4 + l5 + TLD)
+
+    print('size:', len(doms))
+
+    return doms
+
+
 def eliminate_checked(doms):
     with open('checked.txt') as handle:
         content = list(map(str.rstrip, handle.readlines()))
@@ -96,37 +114,43 @@ def report_failures(d):
         h_failed.write(d + '\n')
 
 
-# d = tri_part_dom()
-# d = four_letter_dom()
-d = three_letter_dom()
+def main():
+    # d = tri_part_dom()
+    # d = three_letter_dom()
+    # d = four_letter_dom()
+    d = cvcvc_dom()
 
-domains = eliminate_checked(d)
+    domains = eliminate_checked(d)
 
-# 4. Check list of domains and write to file
+    # 4. Check list of domains and write to file
 
-for domain in domains:
+    for domain in domains:
 
-    sleep(0.5)  # Too many requests lead to incorrect responses
-    print(' Checking: ' + domain),  # Comma means no newline is printed
+        sleep(0.5)  # Too many requests lead to incorrect responses
+        print(' Checking: ' + domain),  # Comma means no newline is printed
 
-    try:
-        w = whois.whois(domain)
-        print('\tTAKEN')
-        with open('checked.txt', 'a') as h_checked:
-            h_checked.write(domain + '\n')
-    except whois.parser.PywhoisError:
-        # Exception means that the domain is free
-        print('\tFREE')
-        with open('free-domains.txt', 'a') as h_free:
-            h_free.write(domain + '\n')
-    except ConnectionResetError:
-        print('~>~>~> Connection reset (ConnectionResetError) error has been thrown')
-        report_failures(domain)
-    except socket.timeout:
-        print('|>|>|> Time out (socket.timeout) error has been thrown')
-        report_failures(domain)
-    except ConnectionRefusedError:
-        print('+>+>+> Connection refused (ConnectionRefusedError) error has been thrown')
-        report_failures(domain)
+        try:
+            w = whois.whois(domain)
+            print('\tTAKEN')
+            with open('checked.txt', 'a') as h_checked:
+                h_checked.write(domain + '\n')
+        except whois.parser.PywhoisError:
+            # Exception means that the domain is free
+            print('\tFREE')
+            with open('free-domains.txt', 'a') as h_free:
+                h_free.write(domain + '\n')
+        except ConnectionResetError:
+            print('~>~>~> Connection reset (ConnectionResetError) error has been thrown')
+            report_failures(domain)
+        except socket.timeout:
+            print('|>|>|> Time out (socket.timeout) error has been thrown')
+            report_failures(domain)
+        except ConnectionRefusedError:
+            print('+>+>+> Connection refused (ConnectionRefusedError) error has been thrown')
+            report_failures(domain)
 
-print("DONE!")
+    print("DONE!")
+
+
+if __name__ == '__main__':
+    main()
