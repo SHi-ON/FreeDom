@@ -17,7 +17,7 @@ TLD = '.com'
 VOWELS = 'aeiou'
 CONSONANTS = ''.join(filter(lambda x: x not in 'aeiou', string.ascii_lowercase))
 
-FILE_NAMES = ['doms_checked.txt', 'doms_failed.txt', 'doms_free.txt']
+FILE_NAMES = ['doms_checked.txt', 'doms_failed.txt', 'doms_forbidden.txt', 'doms_free.txt']
 
 
 def tri_part_dom():
@@ -152,6 +152,9 @@ def main():
             report_failures(domain)
         except ConnectionRefusedError:
             print('+>+>+> Connection refused (ConnectionRefusedError) error has been thrown')
+            report_failures(domain)
+        except:
+            print('Unexpected error has been thrown')
             report_failures(domain)
 
     print("DONE!")
