@@ -17,6 +17,8 @@ TLD = '.com'
 VOWELS = 'aeiou'
 CONSONANTS = ''.join(filter(lambda x: x not in 'aeiou', string.ascii_lowercase))
 
+FILE_NAMES = ['doms_checked.txt', 'doms_failed.txt', 'doms_free.txt']
+
 
 def tri_part_dom():
     # 1. Get prefixes and suffixes from input.txt
@@ -47,7 +49,7 @@ def tri_part_dom():
             doms.append(pre + suff + TLD)
 
     # 3. Get list of domains that have already found to be free and removed them
-    checked_domains = [line.strip() for line in open('checked.txt')]  # Strip out newlines too
+    checked_domains = [line.strip() for line in open('doms_checked.txt')]  # Strip out newlines too
     for remove in checked_domains:
         try:
             doms.remove(remove)
@@ -99,9 +101,12 @@ def cvcvc_dom():
     return doms
 
 
-def eliminate_checked(doms):
-    with open('checked.txt') as handle:
-        content = list(map(str.rstrip, handle.readlines()))
+def eliminate_prior_domains(doms):
+    content = list()
+    for fn in FILE_NAMES:
+        with open(fn) as handle:
+            content += list(map(str.rstrip, handle.readlines()))
+
     filtered = list(filter(lambda x: x not in content, doms))
 
     print('size after the remove:', len(filtered))
@@ -110,7 +115,7 @@ def eliminate_checked(doms):
 
 
 def report_failures(d):
-    with open('failed.txt', 'a') as h_failed:
+    with open('doms_failed.txt', 'a') as h_failed:
         h_failed.write(d + '\n')
 
 
@@ -120,7 +125,7 @@ def main():
     # d = four_letter_dom()
     d = cvcvc_dom()
 
-    domains = eliminate_checked(d)
+    domains = eliminate_prior_domains(d)
 
     # 4. Check list of domains and write to file
 
@@ -132,12 +137,12 @@ def main():
         try:
             w = whois.whois(domain)
             print('\tTAKEN')
-            with open('checked.txt', 'a') as h_checked:
+            with open('doms_checked.txt', 'a') as h_checked:
                 h_checked.write(domain + '\n')
         except whois.parser.PywhoisError:
             # Exception means that the domain is free
             print('\tFREE')
-            with open('free-domains.txt', 'a') as h_free:
+            with open('doms_free.txt', 'a') as h_free:
                 h_free.write(domain + '\n')
         except ConnectionResetError:
             print('~>~>~> Connection reset (ConnectionResetError) error has been thrown')
